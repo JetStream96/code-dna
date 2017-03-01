@@ -22,5 +22,10 @@ test(() => {
 }, 'strReplace test')
 
 test(() => {
+    let s = util.strReplace('12\n34', [[1, 2], [4, 1]])
+    assertEquals('1 \n3 ', s)
+}, 'strReplace multi-line test')
+
+test(() => {
     assertEquals(3, util.charCount('135233', '3'))
 }, 'charCount test')

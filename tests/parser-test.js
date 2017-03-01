@@ -40,3 +40,40 @@ test(() => {
     assertEquals(1, t.lineSpan)
 }, 'parseComments, single line, type 2')
 
+test(() => {
+    let s = `var c = 10; /*
+    comments`
+    let [newTxt ,tokens] = parser.parseComments(s)
+    assertEquals(`var c = 10;   
+            `, newTxt)
+    assertEquals(1, tokens.length)
+    
+    let t = tokens[0]
+    assertEquals(`/*
+    comments`.length, t.length)
+    assertEquals(2, t.lineSpan)
+}, 'parseComments, unclosed multi-line comments, type 2')
+
+test(() => {
+    let [newTxt ,tokens] = parser.parseComments(`var c = 10; /* // xyz
+    123  */
+    var d = 0;
+    // xyz`)
+
+    assertEquals(`var c = 10;          
+           
+    var d = 0;
+          `, newTxt)
+    assertEquals(2, tokens.length)
+    
+    let t0 = tokens[0]
+    assertEquals(`/* // xyz
+    123  */`.length, t0.length)
+    assertEquals(2, t0.lineSpan)
+    assertEquals(1, t0.lineNum)
+
+    let t1 = tokens[1]
+    assertEquals('// xyz'.length, t1.length)
+    assertEquals(1, t1.lineSpan)
+    assertEquals(4, t1.lineNum)
+}, 'parseComments, mixed types')

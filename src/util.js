@@ -1,8 +1,17 @@
+const miniTest = require('../tests/mini-test')
+
+/**
+ * For all characters specified in indexLengthPairs, if it is not \n, it's replaced with space.
+ */
 function strReplace(str, indexLengthPairs) {
     let arr = [...str]
     indexLengthPairs.forEach(p => {
         [index, len] = p
-        range(index, len).forEach(i => arr[i] = ' ')
+        range(index, len).forEach(i => {
+            if (arr[i] != '\n') {
+                arr[i] = ' '
+            }
+        })
     })
     return arr.join('')
 }
