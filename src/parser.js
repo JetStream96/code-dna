@@ -1,6 +1,6 @@
-const fs = require('fs');
-const path = require('path');
-const util = require('./util');
+const fs = require('fs')
+const path = require('path')
+const util = require('./util')
 
 class Token {
 
@@ -9,24 +9,24 @@ class Token {
      * @param {TokenType} type
      */
     constructor(lineNum, type) {
-        this.lineNum = lineNum;
-        this.type = type;
+        this.lineNum = lineNum
+        this.type = type
     }
 }
 
 class StringLiteralToken extends Token {
     constructor(lineNum, lineSpan, length) {
-        super(lineNum, TokenType.stringLiteral);
-        this.lineSpan = lineSpan;
-        this.length = length;
+        super(lineNum, TokenType.stringLiteral)
+        this.lineSpan = lineSpan
+        this.length = length
     }
 }
 
 // filePath: string
 // returns: [Token]
 function parse(filePath) {
-    let text = fs.readFileSync(filePath).replace('\r\n', '\n');
-    let sourceFile = new SourceFile(filePath, text);
+    let text = fs.readFileSync(filePath).replace('\r\n', '\n')
+    let sourceFile = new SourceFile(filePath, text)
 
 }
 
@@ -37,20 +37,20 @@ function parse(filePath) {
  * @returns {[string, StringLiteralToken[]]}
  */
 function parseComments(text) {
-    let matches = reMatches(text, /(\/\/.*?\n|\/\*[\s\S]*?\*\/)/g);
-    let indexLengthPairs = [];
-    let tokens = [];
+    let matches = reMatches(text, /(\/\/.*?\n|\/\*[\s\S]*?\*\/)/g)
+    let indexLengthPairs = []
+    let tokens = []
 
     for (let m of matches) {
-        let s = m[0];
-        let index = m['index'];
-        let num = lineNum(text, index);
+        let s = m[0]
+        let index = m['index']
+        let num = lineNum(text, index)
 
-        indexLengthPairs.push([index, s.length]);        
-        tokens.push(new StringLiteralToken(num, util.charCount(s, '\n') + 1, s.length));
+        indexLengthPairs.push([index, s.length])
+        tokens.push(new StringLiteralToken(num, util.charCount(s, '\n') + 1, s.length))
     }
     
-    return [util.strReplace(text, indexLengthPairs), tokens];
+    return [util.strReplace(text, indexLengthPairs), tokens]
 }
 
 /**
@@ -58,17 +58,17 @@ function parseComments(text) {
  * @param {number} index
  */
 function lineNum(fullText, index) {
-    return util.charCount(fullText.slice(0, index), '\n') + 1;
+    return util.charCount(fullText.slice(0, index), '\n') + 1
 }
 
 function* reMatches(input, re) {
-    yield undefined;
+    yield undefined
     while (true) {
-        let match = re.exec(input);
+        let match = re.exec(input)
         if (match) {
-            yield match;
+            yield match
         } else {
-            break;
+            break
         }
     }
 }
@@ -89,8 +89,8 @@ let TokenType = {
     lambda: 12,
     stringLiteral: 13,
     tryBlock: 14
-};
+}
 
-exports.TokenType = TokenType;
-exports.lineNum = lineNum;
-exports.reMatches = reMatches;
+exports.TokenType = TokenType
+exports.lineNum = lineNum
+exports.reMatches = reMatches

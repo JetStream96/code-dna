@@ -1,32 +1,36 @@
 function strReplace(str, indexLengthPairs) {
-    let arr = [...str];
+    let arr = [...str]
     indexLengthPairs.forEach(p => {
-        [index, len] = p;
-        [...range(index, len)].forEach(i => arr[i] = ' ');
-    });
-    return arr.join('');
+        [index, len] = p
+        range(index, len).forEach(i => arr[i] = ' ')
+    })
+    return arr.join('')
 }
 
-function* range(start, count) {
+function* rangeIter(start, count) {
     if (count < 0) {
-        throw new Error('count cannot be negative.');
+        throw new Error('count cannot be negative.')
     }
 
     for (let n = start; n < start + count; n++) {
-        yield n;
+        yield n
     }
+}
+
+function range(start, count) {
+    return [...rangeIter(start, count)]
 }
 
 function charCount(str, char) {
-    let c = 0;
+    let c = 0
     for (let i of str) {
         if (i === char) {
-            c++;
+            c++
         }
     }
-    return c;
+    return c
 }
 
-exports.strReplace = strReplace;
-exports.range = range;
-exports.charCount = charCount;
+exports.strReplace = strReplace
+exports.range = range
+exports.charCount = charCount
