@@ -37,11 +37,11 @@ function parse(filePath) {
  * @returns {[string, StringLiteralToken[]]}
  */
 function parseComments(text) {
-    let matches = reMatches(text, /(\/\/.*?\n|\/\*[\s\S]*?\*\/)/g)
+    let matches = reMatches(text, /(\/\/.*?(\n|$)|\/\*[\s\S]*?((\*\/)|$))/g)
     let indexLengthPairs = []
     let tokens = []
 
-    for (let m of matches) {
+    for (let m of [...matches].slice(1)) {
         let s = m[0]
         let index = m['index']
         let num = lineNum(text, index)
@@ -92,5 +92,6 @@ let TokenType = {
 }
 
 exports.TokenType = TokenType
+exports.parseComments = parseComments
 exports.lineNum = lineNum
 exports.reMatches = reMatches

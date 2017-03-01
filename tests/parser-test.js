@@ -19,3 +19,24 @@ test(() => {
     assertEquals(1, matches[1]['index'])
     assertEquals(5, matches[2]['index'])
 }, 'reMatches test')
+
+test(() => {
+    let [newTxt ,tokens] = parser.parseComments('var c = 10; // xyz')
+    assertEquals('var c = 10;       ', newTxt)
+    assertEquals(1, tokens.length)
+    
+    let t = tokens[0]
+    assertEquals('// xyz'.length, t.length)
+    assertEquals(1, t.lineSpan)
+}, 'parseComments, single line, type 1')
+
+test(() => {
+    let [newTxt ,tokens] = parser.parseComments('var c = 10; /* xyz */')
+    assertEquals('var c = 10;          ', newTxt)
+    assertEquals(1, tokens.length)
+    
+    let t = tokens[0]
+    assertEquals('/* xyz */'.length, t.length)
+    assertEquals(1, t.lineSpan)
+}, 'parseComments, single line, type 2')
+
