@@ -14,6 +14,14 @@ class Token {
     }
 }
 
+class CommentToken extends Token {
+    constructor(lineNum, lineSpan, length) {
+        super(lineNum, TokenType.stringLiteral)
+        this.lineSpan = lineSpan
+        this.length = length
+    }
+}
+
 class StringLiteralToken extends Token {
     constructor(lineNum, lineSpan, length) {
         super(lineNum, TokenType.stringLiteral)
@@ -34,7 +42,7 @@ function parse(filePath) {
  * Parse and replace all comments with spaces of the same length.
  * The new line chars are preserved.
  * @param {string} text
- * @returns {[string, StringLiteralToken[]]}
+ * @returns {[string, CommentToken[]]}
  */
 function parseComments(text) {
     let matches = reMatches(text, /(\/\/.*?(\n|$)|\/\*[\s\S]*?((\*\/)|$))/g)
@@ -47,7 +55,7 @@ function parseComments(text) {
         let num = lineNum(text, index)
 
         indexLengthPairs.push([index, s.length])
-        tokens.push(new StringLiteralToken(num, util.charCount(s, '\n') + 1, s.length))
+        tokens.push(new CommentToken(num, util.charCount(s, '\n') + 1, s.length))
     }
     
     return [util.strReplace(text, indexLengthPairs), tokens]
