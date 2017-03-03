@@ -16,7 +16,7 @@ class Token {
 
 class CommentToken extends Token {
     constructor(lineNum, lineSpan, length) {
-        super(lineNum, TokenType.stringLiteral)
+        super(lineNum, TokenType.comment)
         this.lineSpan = lineSpan
         this.length = length
     }
@@ -45,23 +45,15 @@ function parse(filePath) {
  * @returns {[string, CommentToken[]]}
  */
 function parseComments(text) {
-    let matches = reMatches(text, /(\/\/.*?(\n|$)|\/\*[\s\S]*?((\*\/)|$))/g)
-    let indexLengthPairs = []
-    let tokens = []
-
-    for (let m of [...matches].slice(1)) {
-        let s = m[0]
-        let index = m['index']
-        let num = lineNum(text, index)
-
-        indexLengthPairs.push([index, s.length])
-        tokens.push(new CommentToken(num, util.charCount(s, '\n') + 1, s.length))
-    }
-    
-    return [util.strReplace(text, indexLengthPairs), tokens]
+    return parseCommentsOrStringLiterals(text, /(\/\/.*?(\n|$)|\/\*[\s\S]*?((\*\/)|$))/g, true)
 }
 
-function parseCommentsOrStringLiterals(text, re) {
+/**
+ * @param {string} text 
+ * @param {RegExp} re 
+ * @param {boolean} isComments 
+ */
+function parseCommentsOrStringLiterals(text, re, isComments) {
     let matches = reMatches(text, re)
     let indexLengthPairs = []
     let tokens = []
@@ -70,9 +62,15 @@ function parseCommentsOrStringLiterals(text, re) {
         let s = m[0]
         let index = m['index']
         let num = lineNum(text, index)
+        let lineSpan = util.charCount(s, '\n') + 1
 
         indexLengthPairs.push([index, s.length])
-        tokens.push(new CommentToken(num, util.charCount(s, '\n') + 1, s.length))
+
+        let t = isComments ? 
+            new CommentToken(num, lineSpan, s.length) :
+            new StringLiteralToken(num, lineSpan, s.length)
+
+        tokens.push(t)
     }
     
     return [util.strReplace(text, indexLengthPairs), tokens]
@@ -131,8 +129,7 @@ function parseStringLiterals(text) {
     // 2: basic string
     // 3: verbatim string
 
-
-
+    return parseCommentsOrStringLiterals(text, re, false)
 }
 
 exports.TokenType = TokenType
