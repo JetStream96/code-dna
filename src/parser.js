@@ -61,6 +61,23 @@ function parseComments(text) {
     return [util.strReplace(text, indexLengthPairs), tokens]
 }
 
+function parseCommentsOrStringLiterals(text, re) {
+    let matches = reMatches(text, re)
+    let indexLengthPairs = []
+    let tokens = []
+
+    for (let m of [...matches].slice(1)) {
+        let s = m[0]
+        let index = m['index']
+        let num = lineNum(text, index)
+
+        indexLengthPairs.push([index, s.length])
+        tokens.push(new CommentToken(num, util.charCount(s, '\n') + 1, s.length))
+    }
+    
+    return [util.strReplace(text, indexLengthPairs), tokens]
+}
+
 /**
  * @param {string} fullText
  * @param {number} index
@@ -97,6 +114,25 @@ let TokenType = {
     lambda: 12,
     stringLiteral: 13,
     tryBlock: 14
+}
+
+
+/**
+ * Parse and replace all string literals with spaces of the same length.
+ * The new line chars are preserved.
+ * @param {string} text
+ * @returns {[string, StringLiteralToken[]]}
+ */
+function parseStringLiterals(text) {
+    let re = /(\$?"[^"\n]*?[^\\]")|(@"[^"]*?[^"]")/g
+    //         ^^ ^^^^^^^^^^^^^^^   ^^^^^^^^^^^^^
+    //         1        2                 3
+    // 1: string interpolation
+    // 2: basic string
+    // 3: verbatim string
+
+
+
 }
 
 exports.TokenType = TokenType
