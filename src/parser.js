@@ -122,7 +122,7 @@ let TokenType = {
  * @returns {[string, StringLiteralToken[]]}
  */
 function parseStringLiterals(text) {
-    let re = /(\$?"[^"\n]*?[^\\]")|(@"[^s^S]*[^"]")[^"]/g
+    let re = /(\$?"[^\n]*?[^\\]")|(@"[^s^S]*[^"]")([^"]|$)/g
     //         ^^ ^^^^^^^^^^^^^^^   ^^^^^^^^^^^^^
     //         1        2                 3
     // 1: string interpolation

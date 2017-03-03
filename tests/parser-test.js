@@ -100,7 +100,7 @@ test(() => {
 
     let t = tokens[0]
     assertEquals(`@"xyz""
-    1";`.length, t.length)
+    1"`.length, t.length)
     assertEquals(1 , t.lineNum)
     assertEquals(2, t.lineSpan)
     assertEquals(parser.TokenType.stringLiteral, t.type)
@@ -113,9 +113,8 @@ test(() => {
     assertEquals(1, tokens.length)
 
     let t = tokens[0]
-    assertEquals(`@"xyz""
-    1";`.length, t.length)
+    assertEquals(`$"xyz\\"1"`.length, t.length)
     assertEquals(1 , t.lineNum)
-    assertEquals(2, t.lineSpan)
+    assertEquals(1, t.lineSpan)
     assertEquals(parser.TokenType.stringLiteral, t.type)
 }, 'verbatim string test')
