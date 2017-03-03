@@ -122,14 +122,28 @@ let TokenType = {
  * @returns {[string, StringLiteralToken[]]}
  */
 function parseStringLiterals(text) {
-    let re = /(\$?"[^"\n]*?[^\\]")|(@"[^"]*?[^"]")/g
+    let re = /(\$?"[^"\n]*?[^\\]")|(@"[^s^S]*[^"]")[^"]/g
     //         ^^ ^^^^^^^^^^^^^^^   ^^^^^^^^^^^^^
     //         1        2                 3
     // 1: string interpolation
     // 2: basic string
     // 3: verbatim string
 
-    return parseCommentsOrStringLiterals(text, re, false)
+    let matches = reMatches(text, re)
+    let indexLengthPairs = []
+    let tokens = []
+
+    for (let m of [...matches].slice(1)) {
+        let s = m[1] ? m[1] : m[2]
+        let index = m['index']
+        let num = lineNum(text, index)
+        let lineSpan = util.charCount(s, '\n') + 1
+
+        indexLengthPairs.push(getIndexLength(s, [index, s.length]))
+        tokens.push(new StringLiteralToken(num, lineSpan, s.length))        
+    }
+    
+    return [util.strReplace(text, indexLengthPairs), tokens]
 }
 
 function getIndexLength(match, indexLengthPair) {
