@@ -2,6 +2,8 @@ const miniTest = require('../tests/mini-test')
 
 /**
  * For all characters specified in indexLengthPairs, if it is not \n, it's replaced with space.
+ * @param {string} str
+ * @param {[number, number][]} indexLengthPairs
  */
 function strReplace(str, indexLengthPairs) {
     let arr = [...str]

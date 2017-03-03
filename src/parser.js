@@ -63,14 +63,15 @@ function parseCommentsOrStringLiterals(text, re, isComments) {
         let index = m['index']
         let num = lineNum(text, index)
         let lineSpan = util.charCount(s, '\n') + 1
+        let pair = [index, s.length]
 
-        indexLengthPairs.push([index, s.length])
-
-        let t = isComments ? 
-            new CommentToken(num, lineSpan, s.length) :
-            new StringLiteralToken(num, lineSpan, s.length)
-
-        tokens.push(t)
+        if (isComments) {
+            indexLengthPairs.push(pair)
+            tokens.push(new CommentToken(num, lineSpan, s.length))
+        } else {
+            indexLengthPairs.push(getIndexLength(s, pair))
+            tokens.push(new StringLiteralToken(num, lineSpan, s.length))
+        }
     }
     
     return [util.strReplace(text, indexLengthPairs), tokens]
@@ -114,7 +115,6 @@ let TokenType = {
     tryBlock: 14
 }
 
-
 /**
  * Parse and replace all string literals with spaces of the same length.
  * The new line chars are preserved.
@@ -132,7 +132,18 @@ function parseStringLiterals(text) {
     return parseCommentsOrStringLiterals(text, re, false)
 }
 
+function getIndexLength(match, indexLengthPair) {
+    let [ind, len] = indexLengthPair
+    if (match[0] === '"') {
+        return [ind + 1, len - 2]
+    }
+
+    // Is @" or $" style comments
+    return [ind + 2, len - 3]
+}
+
 exports.TokenType = TokenType
 exports.parseComments = parseComments
 exports.lineNum = lineNum
 exports.reMatches = reMatches
+exports.parseStringLiterals = parseStringLiterals

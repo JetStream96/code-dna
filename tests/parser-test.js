@@ -21,7 +21,7 @@ test(() => {
 }, 'reMatches test')
 
 test(() => {
-    let [newTxt ,tokens] = parser.parseComments('var c = 10; // xyz')
+    let [newTxt, tokens] = parser.parseComments('var c = 10; // xyz')
     assertEquals('var c = 10;       ', newTxt)
     assertEquals(1, tokens.length)
     
@@ -31,7 +31,7 @@ test(() => {
 }, 'parseComments, single line, type 1')
 
 test(() => {
-    let [newTxt ,tokens] = parser.parseComments('var c = 10; /* xyz */')
+    let [newTxt, tokens] = parser.parseComments('var c = 10; /* xyz */')
     assertEquals('var c = 10;          ', newTxt)
     assertEquals(1, tokens.length)
     
@@ -43,7 +43,7 @@ test(() => {
 test(() => {
     let s = `var c = 10; /*
     comments`
-    let [newTxt ,tokens] = parser.parseComments(s)
+    let [newTxt, tokens] = parser.parseComments(s)
     assertEquals(`var c = 10;   
             `, newTxt)
     assertEquals(1, tokens.length)
@@ -55,7 +55,7 @@ test(() => {
 }, 'parseComments, unclosed multi-line comments, type 2')
 
 test(() => {
-    let [newTxt ,tokens] = parser.parseComments(`var c = 10; /* // xyz
+    let [newTxt, tokens] = parser.parseComments(`var c = 10; /* // xyz
     123  */
     var d = 0;
     // xyz`)
@@ -77,3 +77,45 @@ test(() => {
     assertEquals(1, t1.lineSpan)
     assertEquals(4, t1.lineNum)
 }, 'parseComments, mixed types')
+
+test(() => {
+    let s = `var s = "xyz\\"";` // Escaped backslash. Actually is: var s = "xyz\"";
+    let [newTxt, tokens] = parser.parseStringLiterals(s)
+    assertEquals(`var s = "     ";`, newTxt)
+    assertEquals(1, tokens.length)
+
+    let t = tokens[0]
+    assertEquals(`"xyz\\""`.length, t.length)
+    assertEquals(1 , t.lineNum)
+    assertEquals(1, t.lineSpan)
+    assertEquals(parser.TokenType.stringLiteral, t.type)
+}, 'basic string literal test')
+
+test(() => {
+    let [newTxt, tokens] = parser.parseStringLiterals(`var s = @"xyz""
+    1";`)
+    assertEquals(`var s = @"     
+     ";`, newTxt)
+    assertEquals(1, tokens.length)
+
+    let t = tokens[0]
+    assertEquals(`@"xyz""
+    1";`.length, t.length)
+    assertEquals(1 , t.lineNum)
+    assertEquals(2, t.lineSpan)
+    assertEquals(parser.TokenType.stringLiteral, t.type)
+}, 'verbatim string test')
+
+test(() => {
+    let s = `var s = $"xyz\\"1";` // Escaped backslash. Actually is: var s = $"xyz\"1";
+    let [newTxt, tokens] = parser.parseStringLiterals(s)
+    assertEquals(`var s = $"      ";`, newTxt)
+    assertEquals(1, tokens.length)
+
+    let t = tokens[0]
+    assertEquals(`@"xyz""
+    1";`.length, t.length)
+    assertEquals(1 , t.lineNum)
+    assertEquals(2, t.lineSpan)
+    assertEquals(parser.TokenType.stringLiteral, t.type)
+}, 'verbatim string test')
