@@ -147,18 +147,45 @@ function getIndexLength(match, indexLengthPair) {
     return [ind + 2, len - 3]
 }
 
+function createToken(text, re, type) {
+    let m = reMatches(text, re)
+    return m.map(i => new Token(lineNum(text, i['index']), type)) 
+}
+
 /**
  * @param {string} text 
  * @returns {Token[]}
  */
 function parseIfElse(text) {
-    let m = reMatches(text, /\b((else\s+)?if)|(else)\b/g)
-    return m.map(i => new Token(lineNum(text, i['index']), TokenType.ifStatement)) 
+    return createToken(text, /\b((else\s+)?if)|(else)\b/g, TokenType.ifStatement)
 }
 
 function parseDoWhile(text) {
-    let m = reMatches(text, /\b(do|while)\b/g)
-    return m.map(i => new Token(lineNum(text, i['index']), TokenType.whileStatement)) 
+    return createToken(text, /\b(do|while)\b/g, TokenType.whileStatement)
+}
+
+function parseSwitchCase(text) {
+    return createToken(text, /\b(switch|case)\b/g, TokenType.switchCase)
+}
+
+function parseForLoop(text) {
+    return createToken(text, /\bfor(each)?\b/g, TokenType.forLoop)
+}
+
+function parseClassOrStruct(text) {
+    return createToken(text, /\b(class|struct)\b/g, TokenType.classOrStruct)
+}
+
+function parseInterface(text) {
+    return createToken(text, /\binterface\b/g, TokenType.interface)
+}
+
+function parsetryCatchFinally(text) {
+    return createToken(text, /\b(try|catch|finally)\b/g, TokenType.tryCatchFinally)
+}
+
+function parseUsing(text) {
+    return createToken(text, /\busing\b/g, TokenType.using)
 }
 
 exports.TokenType = TokenType
