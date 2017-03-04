@@ -35,9 +35,17 @@ class StringLiteralToken extends Token {
 function parse(filePath) {
     let text = fs.readFileSync(filePath).replace('\r\n', '\n')
     let [text1, comments] = parseComments(text)
-    let [text2, strings] = parseStringLiterals(text1)
+    let [t, strings] = parseStringLiterals(text1)
 
-
+    let ifElse = parseIfElse(t)
+    let doWhile = parseDoWhile(t)
+    let switchCase = parseSwitchCase(t)
+    let forLoop = parseForLoop(t)
+    let classOrStruct = parseClassOrStruct(t)
+    let interface = parseInterface(t)
+    let tryCatchFinally = parsetryCatchFinally(t)
+    let using = parseUsing(t)
+    
 }
 
 /**
