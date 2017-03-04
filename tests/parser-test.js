@@ -118,3 +118,19 @@ test(() => {
     assertEquals(1, t.lineSpan)
     assertEquals(parser.TokenType.stringLiteral, t.type)
 }, 'verbatim string test')
+
+test(() => {
+    let s = `
+var s = $"xyz\\"1";
+s = "";
+s = @"
+";
+s = $"";` 
+    let [newTxt, tokens] = parser.parseStringLiterals(s)
+    assertEquals(4, tokens.length)
+
+    assertEquals(`$"xyz\\"1"`.length, tokens[0].length)
+    assertEquals(2, tokens[1].length)
+    assertEquals(4, tokens[2].length)
+    assertEquals(3, tokens[3].length)
+}, 'mixed strings and empty strings test')

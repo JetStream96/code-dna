@@ -122,9 +122,9 @@ let TokenType = {
  * @returns {[string, StringLiteralToken[]]}
  */
 function parseStringLiterals(text) {
-    let re = /(\$?"[^\n]*?[^\\]")|(@"[^s^S]*[^"]")([^"]|$)/g
-    //         ^^ ^^^^^^^^^^^^^^^   ^^^^^^^^^^^^^
-    //         1        2                 3
+    let re = /(\$?"([^\n]*?[^\\])?")|(@"([^s^S]*[^"])?")([^"]|$)/g
+    //         ^^ ^^^^^^^^^^^^^^^^^   ^^^^^^^^^^^^^^^^^^^^^^^^^
+    //         1          2                       3
     // 1: string interpolation
     // 2: basic string
     // 3: verbatim string
@@ -134,7 +134,7 @@ function parseStringLiterals(text) {
     let tokens = []
 
     for (let m of [...matches].slice(1)) {
-        let s = m[1] ? m[1] : m[2]
+        let s = m[1] ? m[1] : m[3]
         let index = m['index']
         let num = lineNum(text, index)
         let lineSpan = util.charCount(s, '\n') + 1
