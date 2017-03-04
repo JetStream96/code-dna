@@ -134,3 +134,53 @@ s = $"";`
     assertEquals(4, tokens[2].length)
     assertEquals(3, tokens[3].length)
 }, 'mixed strings and empty strings test')
+
+test(() => {
+    let s = `
+    if(x == 0) 
+    {
+        return 0;
+    }
+    else if (x >= -5) 
+    {
+        return x + 10;
+    } 
+    else 
+    {
+        return x - 10;
+    }`
+
+    let tokens = parser.parseIfElse(s)
+    assertEquals(3, tokens.length)
+
+    let [t0, t1, t2] = tokens
+    assertEquals(2, t0.lineNum)
+    assertEquals(6, t1.lineNum)
+    assertEquals(10, t2.lineNum)
+    assertEquals(true, tokens.every(t => t.type === parser.TokenType.ifStatement)) 
+}, 'parsing if else test')
+
+test(() => {
+    let s = `
+    while(x < 10) x++;
+
+    do 
+    {
+        p = getP(p, 5);
+    } while (p > 0)
+    
+    while (true) 
+    {
+        if (t++ > 0) return;
+    }`
+
+    let tokens = parser.parseDoWhile(s)
+    assertEquals(4, tokens.length)
+
+    let [t0, t1, t2, t3] = tokens
+    assertEquals(2, t0.lineNum)
+    assertEquals(4, t1.lineNum)
+    assertEquals(7, t2.lineNum)
+    assertEquals(9, t3.lineNum)
+    assertEquals(true, tokens.every(t => t.type === parser.TokenType.whileStatement))
+}, 'parsing do while test')

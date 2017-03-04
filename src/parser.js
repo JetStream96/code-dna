@@ -147,8 +147,24 @@ function getIndexLength(match, indexLengthPair) {
     return [ind + 2, len - 3]
 }
 
+/**
+ * @param {string} text 
+ * @returns {Token[]}
+ */
+function parseIfElse(text) {
+    let m = reMatches(text, /\b((else\s+)?if)|(else)\b/g)
+    return m.map(i => new Token(lineNum(text, i['index']), TokenType.ifStatement)) 
+}
+
+function parseDoWhile(text) {
+    let m = reMatches(text, /\b(do|while)\b/g)
+    return m.map(i => new Token(lineNum(text, i['index']), TokenType.whileStatement)) 
+}
+
 exports.TokenType = TokenType
 exports.parseComments = parseComments
 exports.lineNum = lineNum
 exports.reMatches = reMatches
 exports.parseStringLiterals = parseStringLiterals
+exports.parseIfElse = parseIfElse
+exports.parseDoWhile = parseDoWhile
