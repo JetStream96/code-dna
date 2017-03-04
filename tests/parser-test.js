@@ -12,12 +12,12 @@ test(() => {
 
 test(() => {
     let s = "12a213a"
-    let matches = [...parser.reMatches(s, /\da/g)]
-    assertEquals(2 + 1, matches.length)
-    assertEquals('2a', matches[1][0])
-    assertEquals('3a', matches[2][0])
-    assertEquals(1, matches[1]['index'])
-    assertEquals(5, matches[2]['index'])
+    let matches = parser.reMatches(s, /\da/g)
+    assertEquals(2, matches.length)
+    assertEquals('2a', matches[0][0])
+    assertEquals('3a', matches[1][0])
+    assertEquals(1, matches[0]['index'])
+    assertEquals(5, matches[1]['index'])
 }, 'reMatches test')
 
 test(() => {

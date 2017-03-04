@@ -34,7 +34,10 @@ class StringLiteralToken extends Token {
 // returns: [Token]
 function parse(filePath) {
     let text = fs.readFileSync(filePath).replace('\r\n', '\n')
-    
+    let [text1, comments] = parseComments(text)
+    let [text2, strings] = parseStringLiterals(text1)
+
+
 }
 
 /**
@@ -48,7 +51,7 @@ function parseComments(text) {
     let indexLengthPairs = []
     let tokens = []
 
-    for (let m of [...matches].slice(1)) {
+    for (let m of matches) {
         let s = m[0]
         let index = m['index']
         let num = lineNum(text, index)
@@ -69,8 +72,11 @@ function lineNum(fullText, index) {
     return util.charCount(fullText.slice(0, index), '\n') + 1
 }
 
-function* reMatches(input, re) {
-    yield undefined
+function reMatches(input, re) {
+    return [...reMatchesIter(input, re)]
+}
+
+function* reMatchesIter(input, re) {
     while (true) {
         let match = re.exec(input)
         if (match) {
@@ -118,7 +124,7 @@ function parseStringLiterals(text) {
     let indexLengthPairs = []
     let tokens = []
 
-    for (let m of [...matches].slice(1)) {
+    for (let m of matches) {
         let s = m[1] ? m[1] : m[3]
         let index = m['index']
         let num = lineNum(text, index)
