@@ -34,8 +34,7 @@ class StringLiteralToken extends Token {
 // returns: [Token]
 function parse(filePath) {
     let text = fs.readFileSync(filePath).replace('\r\n', '\n')
-    let sourceFile = new SourceFile(filePath, text)
-
+    
 }
 
 /**
@@ -45,16 +44,7 @@ function parse(filePath) {
  * @returns {[string, CommentToken[]]}
  */
 function parseComments(text) {
-    return parseCommentsOrStringLiterals(text, /(\/\/.*?(\n|$)|\/\*[\s\S]*?((\*\/)|$))/g, true)
-}
-
-/**
- * @param {string} text 
- * @param {RegExp} re 
- * @param {boolean} isComments 
- */
-function parseCommentsOrStringLiterals(text, re, isComments) {
-    let matches = reMatches(text, re)
+    let matches = reMatches(text, /(\/\/.*?(\n|$)|\/\*[\s\S]*?((\*\/)|$))/g)
     let indexLengthPairs = []
     let tokens = []
 
@@ -63,15 +53,9 @@ function parseCommentsOrStringLiterals(text, re, isComments) {
         let index = m['index']
         let num = lineNum(text, index)
         let lineSpan = util.charCount(s, '\n') + 1
-        let pair = [index, s.length]
 
-        if (isComments) {
-            indexLengthPairs.push(pair)
-            tokens.push(new CommentToken(num, lineSpan, s.length))
-        } else {
-            indexLengthPairs.push(getIndexLength(s, pair))
-            tokens.push(new StringLiteralToken(num, lineSpan, s.length))
-        }
+        indexLengthPairs.push([index, s.length])
+        tokens.push(new CommentToken(num, lineSpan, s.length))        
     }
     
     return [util.strReplace(text, indexLengthPairs), tokens]
@@ -112,7 +96,8 @@ let TokenType = {
     comment: 11,
     lambda: 12,
     stringLiteral: 13,
-    tryBlock: 14
+    tryCatchFinally: 14,
+    using: 15
 }
 
 /**
