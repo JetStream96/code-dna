@@ -39,6 +39,8 @@ function parse(filePath) {
     let [text1, comments] = parseComments(text)
     let [t, strings] = parseStringLiterals(text1)
 
+    let property = parseProperty(t)
+    let field = parseFields(t)
     let ifElse = parseIfElse(t)
     let doWhile = parseDoWhile(t)
     let switchCase = parseSwitchCase(t)
@@ -47,7 +49,11 @@ function parse(filePath) {
     let interface = parseInterface(t)
     let tryCatchFinally = parseTryCatchFinally(t)
     let using = parseUsing(t)
-    
+    let assignment = parseAssignment(t)
+    let instantiation = parseNew(t)
+    let returnStatement = parseReturn(t)
+
+    let empty = parseEmptyLines(t)
 }
 
 /**
@@ -99,24 +105,22 @@ function* reMatchesIter(input, re) {
 
 let TokenType = {
     property: 0,
-    // propertySetter: 1,
-    field: 2,
-    ifStatement: 3,
-    whileStatement: 4,
-    switchCase: 5,
-    forLoop: 6,
-    function: 7,
-    classOrStruct: 8,
-    interface: 9,
-    emptyLine: 10,
-    comment: 11,
-    lambda: 12,
-    stringLiteral: 13,
-    tryCatchFinally: 14,
-    using: 15,
-    assignment: 16,
-    instantiation: 17,
-    return: 18
+    field: 1,
+    ifStatement: 2,
+    whileStatement: 3,
+    switchCase: 4,
+    forLoop: 5,
+    function: 6,
+    classOrStruct: 7,
+    interface: 8,
+    emptyLine: 9,
+    comment: 10,
+    stringLiteral: 11,
+    tryCatchFinally: 12,
+    using: 13,
+    assignment: 14,
+    instantiation: 15,
+    return: 16
 }
 
 /**
@@ -216,40 +220,6 @@ function parseProperty(text) {
     return createToken(text, re, TokenType.property)
 }
 
-/**
- * Returns the matches, which contains the texts between (including) the two curly brackets. 
- */
-function matchClassStructInterface(text) {
-    let m = reMatches(text, /\b(class|struct|interface)\b/g)
-    return m.map(i => {
-        let index = i['index']
-        let leftBraket = text.indexOf('{', index)
-        if (leftBraket < 0) return undefined
-
-        let rightBraket = getRightCurlyBracketIndex(text, leftBraket + 1)
-        if (rightBraket === -1) return undefined
-        return [leftBraket, rightBraket]
-    }).filter(m => m !== undefined)
-}
-
-// Returns -1 if not found.
-function getRightCurlyBracketIndex(text, start=0) {
-    let extraCount = 0
-    for (let i of range(start, text.length - start)) {
-        let c = text[i]
-        if (extraCount === 0 && c === '}') {
-            return i
-        }
-
-        if (c === '{') {
-            extraCount++
-        } else if (c === '}') {
-            extraCount--
-        }
-    }
-    return -1
-}
-
 function parseFields(text) {
     let mod = modifiers()
     let id = identifierName()
@@ -290,6 +260,11 @@ function parseReturn(text) {
     return createToken(text, /\breturn\b/g, TokenType.return)
 }
 
+// Match the lines that are effectively empty.
+function parseEmptyLines(text) {
+    return createToken(text, /^\W.*$/gm, TokenType.emptyLine)
+}
+
 exports.TokenType = TokenType
 exports.parseComments = parseComments
 exports.lineNum = lineNum
@@ -298,6 +273,5 @@ exports.parseStringLiterals = parseStringLiterals
 exports.parseIfElse = parseIfElse
 exports.parseDoWhile = parseDoWhile
 exports.parseProperty = parseProperty
-exports.matchClassStructInterface = matchClassStructInterface
 exports.parseFields = parseFields
 exports.parseFunc = parseFunc

@@ -206,13 +206,6 @@ test(() => {
 }, 'parsing property test')
 
 test(() => {
-    assertArrEquals([7, 8], parser.matchClassStructInterface('class A{}')[0])
-    assertArrEquals([9, 26], parser.matchClassStructInterface('struct A { int X { get; } }')[0])
-    assertArrEquals([12, 42], 
-        parser.matchClassStructInterface('interface A { void F{Action a = () => {};}}')[0])
-}, 'matchClassStructInterface test')
-
-test(() => {
     let s = `public static readonly List<string[]> S = "x";
     const int _y = 10;
     static string str;
