@@ -243,3 +243,20 @@ test(() => {
     assertEquals(true, tokens.every(t => t.type === parser.TokenType.field))
     assertArrEquals([1, 2, 3, 4, 5], tokens.map(t => t.lineNum))
 }, 'parseFields test')
+
+test(() => {
+    let s = `static string str;
+    private const int = 8;
+    int t = 10;
+    int T() {return 10;}
+    private static double _X(int x, int y)
+    {
+        return 0.0;
+    }
+    int U => 10;
+    int V(bool b) => 10;`
+
+    let tokens = parser.parseFunc(s)
+    assertEquals(true, tokens.every(t => t.type === parser.TokenType.function))
+    assertArrEquals([4, 5, 10], tokens.map(t => t.lineNum))
+}, 'parseFunc test')

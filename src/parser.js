@@ -45,7 +45,7 @@ function parse(filePath) {
     let forLoop = parseForLoop(t)
     let classOrStruct = parseClassOrStruct(t)
     let interface = parseInterface(t)
-    let tryCatchFinally = parsetryCatchFinally(t)
+    let tryCatchFinally = parseTryCatchFinally(t)
     let using = parseUsing(t)
     
 }
@@ -105,7 +105,7 @@ let TokenType = {
     whileStatement: 4,
     switchCase: 5,
     forLoop: 6,
-    functions: 7,
+    function: 7,
     classOrStruct: 8,
     interface: 9,
     emptyLine: 10,
@@ -113,7 +113,9 @@ let TokenType = {
     lambda: 12,
     stringLiteral: 13,
     tryCatchFinally: 14,
-    using: 15
+    using: 15,
+    assignment: 16,
+    instantiation: 17
 }
 
 /**
@@ -190,12 +192,20 @@ function parseInterface(text) {
     return createToken(text, /\binterface\b/g, TokenType.interface)
 }
 
-function parsetryCatchFinally(text) {
+function parseTryCatchFinally(text) {
     return createToken(text, /\b(try|catch|finally)\b/g, TokenType.tryCatchFinally)
 }
 
 function parseUsing(text) {
     return createToken(text, /\busing\b/g, TokenType.using)
+}
+
+function parseAssignment(text) {
+    return createToken(text, /=(?!>)/g, TokenType.assignment)
+}
+
+function parseNew(text) {
+    return createToken(text, /\bnew\b/g, TokenType.instantiation)
 }
 
 function parsePropertyGetter(text) {
@@ -245,7 +255,7 @@ function getRightCurlyBracketIndex(text, start=0) {
 function parseFields(text) {
     let mod = modifiers()
     let id = identifierName()
-    let re = new RegExp(`(${mod}\\s+?)*?${id}\\s+${id}\\s*?(=(?!>)|;)`, 'g')
+    let re = new RegExp(`${modifierTypeIdentifier()}\\s*?(=(?!>)|;)`, 'g')
     return createToken(text, re, TokenType.field)
 }
 
@@ -254,7 +264,18 @@ function identifierName() {
 }
 
 function modifiers() {
-    return /\b(public|private|internal|protected|readonly|const|static)\b/.source
+    return /\b(public|private|internal|protected|readonly|const|static|abstract|override)\b/.source
+}
+
+function modifierTypeIdentifier() {
+    let mod = modifiers()
+    let id = identifierName()
+    return `(${mod}\\s+?)*?${id}\\s+${id}`
+}
+
+function parseFunc(text) {
+    let re = new RegExp(`${modifierTypeIdentifier()}\\s*?\\([^\\)]*?\\)`, 'g')
+    return createToken(text, re, TokenType.function)
 }
 
 exports.TokenType = TokenType
@@ -268,3 +289,4 @@ exports.parsePropertyGetter = parsePropertyGetter
 exports.parsePropertySetter = parsePropertySetter
 exports.matchClassStructInterface = matchClassStructInterface
 exports.parseFields = parseFields
+exports.parseFunc = parseFunc
