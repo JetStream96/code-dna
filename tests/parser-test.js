@@ -235,3 +235,15 @@ test(() => {
     assertEquals(true, tokens.every(t => t.type === parser.TokenType.function))
     assertArrEquals([4, 5, 10], tokens.map(t => t.lineNum))
 }, 'parseFunc test')
+
+test(() => {
+    let s = `a==b;
+    a = 3
+    a >= 4
+    a += 5
+    a != 'u'
+    a => a * 2`
+
+    let tokens = parser.parseAssignment(s)
+    assertArrEquals([2, 4], tokens.map(t => t.lineNum))
+}, 'parse assignments test')

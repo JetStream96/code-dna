@@ -206,7 +206,7 @@ function parseUsing(text) {
 }
 
 function parseAssignment(text) {
-    return createToken(text, /=(?!>)/g, TokenType.assignment)
+    return createToken(text, /[\b\s][+\-*/]?=[\b\s]/g, TokenType.assignment)
 }
 
 function parseNew(text) {
@@ -275,3 +275,4 @@ exports.parseDoWhile = parseDoWhile
 exports.parseProperty = parseProperty
 exports.parseFields = parseFields
 exports.parseFunc = parseFunc
+exports.parseAssignment = parseAssignment
