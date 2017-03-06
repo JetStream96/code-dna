@@ -187,7 +187,7 @@ test(() => {
     assertEquals(9, t3.lineNum)
     assertEquals(true, tokens.every(t => t.type === parser.TokenType.whileStatement))
 }, 'parsing do while test')
-/*
+
 test(() => {
     let s = `public static int Id { get; set; }
     private Dictionary<string, double> Dict => _dict;
@@ -200,29 +200,11 @@ test(() => {
         }
     }`
 
-    let tokens = parser.parsePropertyGetter(s)
-    assertEquals(true, tokens.every(t => t.type === parser.TokenType.propertyGetter))
-    assertEquals(true, util.arrEquals([1, 2, 3, 6]), tokens.map(t => t.lineNum))
-}, 'parsing property getter test')
+    let tokens = parser.parseProperty(s)
+    assertEquals(true, tokens.every(t => t.type === parser.TokenType.property))
+    assertArrEquals([1, 2, 3, 4], tokens.map(t => t.lineNum))
+}, 'parsing property test')
 
-
-test(() => {
-    let s = `public static int Id { get; set; }
-    private Dictionary<string, double> setDict {};
-    int Count { internal get; private set; } = 10
-    public int Number 
-    {
-        set
-        {
-            _num = 42;
-        }
-    }`
-
-    let tokens = parser.parsePropertySetter(s)
-    assertEquals(true, tokens.every(t => t.type === parser.TokenType.propertySetter))
-    assertEquals(true, util.arrEquals([1, 3, 6]), tokens.map(t => t.lineNum))
-}, 'parsing property setter test')
-*/
 test(() => {
     assertArrEquals([7, 8], parser.matchClassStructInterface('class A{}')[0])
     assertArrEquals([9, 26], parser.matchClassStructInterface('struct A { int X { get; } }')[0])

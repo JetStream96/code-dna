@@ -98,8 +98,8 @@ function* reMatchesIter(input, re) {
 }
 
 let TokenType = {
-    propertyGetter: 0,
-    propertySetter: 1,
+    property: 0,
+    // propertySetter: 1,
     field: 2,
     ifStatement: 3,
     whileStatement: 4,
@@ -209,14 +209,11 @@ function parseNew(text) {
     return createToken(text, /\bnew\b/g, TokenType.instantiation)
 }
 
-function parsePropertyGetter(text) {
-    let targetScopes = matchClassStructInterface(text)
-
-    ///{[\s\S]*?(get)\b/g
-}
-
-function parsePropertySetter(text) {
-
+function parseProperty(text) {
+    let mti = modifierTypeIdentifier()
+    let am = accessModifiers()
+    let re = new RegExp(`${mti}\\s*?(=>|{\\s*?${am}?\\s*?[gs]et\\s*?[;{])`, 'g')
+    return createToken(text, re, TokenType.property)
 }
 
 /**
@@ -273,6 +270,10 @@ function modifiers() {
     return /\b(public|private|internal|protected|readonly|const|static|abstract|override)\b/.source
 }
 
+function accessModifiers() {
+    return '(public|private|internal|protected)'
+}
+
 function modifierTypeIdentifier() {
     let mod = modifiers()
     let t = typeName()
@@ -296,8 +297,7 @@ exports.reMatches = reMatches
 exports.parseStringLiterals = parseStringLiterals
 exports.parseIfElse = parseIfElse
 exports.parseDoWhile = parseDoWhile
-exports.parsePropertyGetter = parsePropertyGetter
-exports.parsePropertySetter = parsePropertySetter
+exports.parseProperty = parseProperty
 exports.matchClassStructInterface = matchClassStructInterface
 exports.parseFields = parseFields
 exports.parseFunc = parseFunc
