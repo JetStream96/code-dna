@@ -243,7 +243,18 @@ function getRightCurlyBracketIndex(text, start=0) {
 }
 
 function parseFields(text) {
+    let mod = modifiers()
+    let id = identifierName()
+    let re = new RegExp(`(${mod}\\s+?)*?${id}\\s+${id}\\s*?(=(?!>)|;)`, 'g')
+    return createToken(text, re, TokenType.field)
+}
 
+function identifierName() {
+    return /\b[_A-Za-z]\w*?\b/.source
+}
+
+function modifiers() {
+    return /\b(public|private|internal|protected|readonly|const|static)\b/.source
 }
 
 exports.TokenType = TokenType
