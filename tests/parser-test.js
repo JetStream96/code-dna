@@ -231,7 +231,7 @@ test(() => {
 }, 'matchClassStructInterface test')
 
 test(() => {
-    let s = `public static readonly string S = "x";
+    let s = `public static readonly List<string[]> S = "x";
     const int _y = 10;
     static string str;
     private const int = 8;
@@ -249,9 +249,9 @@ test(() => {
     private const int = 8;
     int t = 10;
     int T() {return 10;}
-    private static double _X(int x, int y)
+    private static List<double> _X(int x, int y)
     {
-        return 0.0;
+        return new List<double> { 0.0 };
     }
     int U => 10;
     int V(bool b) => 10;`

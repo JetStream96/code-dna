@@ -115,7 +115,8 @@ let TokenType = {
     tryCatchFinally: 14,
     using: 15,
     assignment: 16,
-    instantiation: 17
+    instantiation: 17,
+    return: 18
 }
 
 /**
@@ -263,19 +264,29 @@ function identifierName() {
     return /\b[_A-Za-z]\w*?\b/.source
 }
 
+function typeName() {
+    // Need to match generics and array.
+    return /\b[_A-Za-z][<, >\[\]\w]*?(?!<, >\[\]\w)/.source
+}
+
 function modifiers() {
     return /\b(public|private|internal|protected|readonly|const|static|abstract|override)\b/.source
 }
 
 function modifierTypeIdentifier() {
     let mod = modifiers()
+    let t = typeName()
     let id = identifierName()
-    return `(${mod}\\s+?)*?${id}\\s+${id}`
+    return `(${mod}\\s+?)*?${t}\\s+${id}`
 }
 
 function parseFunc(text) {
     let re = new RegExp(`${modifierTypeIdentifier()}\\s*?\\([^\\)]*?\\)`, 'g')
     return createToken(text, re, TokenType.function)
+}
+
+function parseReturn(text) {
+    return createToken(text, /\breturn\b/g, TokenType.return)
 }
 
 exports.TokenType = TokenType
