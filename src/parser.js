@@ -2,6 +2,8 @@ const fs = require('fs')
 const path = require('path')
 const util = require('./util')
 
+const range = util.range
+
 class Token {
 
     /**
@@ -196,6 +198,54 @@ function parseUsing(text) {
     return createToken(text, /\busing\b/g, TokenType.using)
 }
 
+function parsePropertyGetter(text) {
+    let targetScopes = matchClassStructInterface(text)
+
+    ///{[\s\S]*?(get)\b/g
+}
+
+function parsePropertySetter(text) {
+
+}
+
+/**
+ * Returns the matches, which contains the texts between (including) the two curly brackets. 
+ */
+function matchClassStructInterface(text) {
+    let m = reMatches(text, /\b(class|struct|interface)\b/g)
+    return m.map(i => {
+        let index = i['index']
+        let leftBraket = text.indexOf('{', index)
+        if (leftBraket < 0) return undefined
+
+        let rightBraket = getRightCurlyBracketIndex(text, leftBraket + 1)
+        if (rightBraket === -1) return undefined
+        return [leftBraket, rightBraket]
+    }).filter(m => m !== undefined)
+}
+
+// Returns -1 if not found.
+function getRightCurlyBracketIndex(text, start=0) {
+    let extraCount = 0
+    for (let i of range(start, text.length - start)) {
+        let c = text[i]
+        if (extraCount === 0 && c === '}') {
+            return i
+        }
+
+        if (c === '{') {
+            extraCount++
+        } else if (c === '}') {
+            extraCount--
+        }
+    }
+    return -1
+}
+
+function parseFields(text) {
+
+}
+
 exports.TokenType = TokenType
 exports.parseComments = parseComments
 exports.lineNum = lineNum
@@ -203,3 +253,7 @@ exports.reMatches = reMatches
 exports.parseStringLiterals = parseStringLiterals
 exports.parseIfElse = parseIfElse
 exports.parseDoWhile = parseDoWhile
+exports.parsePropertyGetter = parsePropertyGetter
+exports.parsePropertySetter = parsePropertySetter
+exports.matchClassStructInterface = matchClassStructInterface
+exports.parseFields = parseFields

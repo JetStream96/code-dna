@@ -2,6 +2,9 @@ const miniTest = require('./mini-test')
 const [test, assertEquals] = [miniTest.test, miniTest.assertEquals]
 
 const parser = require('../src/parser')
+const util = require('../src/util')
+const testUtil = require('./test-util')
+const assertArrEquals = testUtil.assertArrEquals
 
 test(() => {
     let s = '123\n4\n56'
@@ -184,3 +187,45 @@ test(() => {
     assertEquals(9, t3.lineNum)
     assertEquals(true, tokens.every(t => t.type === parser.TokenType.whileStatement))
 }, 'parsing do while test')
+
+test(() => {
+    let s = `public static int Id { get; set; }
+    private Dictionary<string, double> Dict => _dict;
+    int Count { internal get; private set; } = 10
+    public int Number 
+    {
+        get
+        {
+            return 42;
+        }
+    }`
+
+    let tokens = parser.parsePropertyGetter(s)
+    assertEquals(true, tokens.every(t => t.type === parser.TokenType.propertyGetter))
+    assertEquals(true, util.arrEquals([1, 2, 3, 6]), tokens.map(t => t.lineNum))
+}, 'parsing property getter test')
+
+
+test(() => {
+    let s = `public static int Id { get; set; }
+    private Dictionary<string, double> setDict {};
+    int Count { internal get; private set; } = 10
+    public int Number 
+    {
+        set
+        {
+            _num = 42;
+        }
+    }`
+
+    let tokens = parser.parsePropertySetter(s)
+    assertEquals(true, tokens.every(t => t.type === parser.TokenType.propertySetter))
+    assertEquals(true, util.arrEquals([1, 3, 6]), tokens.map(t => t.lineNum))
+}, 'parsing property setter test')
+
+test(() => {
+    assertArrEquals([7, 8], parser.matchClassStructInterface('class A{}')[0])
+    assertArrEquals([9, 26], parser.matchClassStructInterface('struct A { int X { get; } }')[0])
+    assertArrEquals([12, 42], 
+        parser.matchClassStructInterface('interface A { void F{Action a = () => {};}}')[0])
+}, 'matchClassStructInterface test')
