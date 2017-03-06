@@ -42,6 +42,15 @@ function charCount(str, char) {
     return c
 }
 
+function arrEquals(arr1, arr2) {
+    if (arr1.length !== arr2.length) {
+        return false
+    }
+
+    return arr1.every((e, i) => e === arr2[i])
+}
+
 exports.strReplace = strReplace
 exports.range = range
 exports.charCount = charCount
+exports.arrEquals = arrEquals

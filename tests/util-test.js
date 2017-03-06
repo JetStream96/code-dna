@@ -29,3 +29,8 @@ test(() => {
 test(() => {
     assertEquals(3, util.charCount('135233', '3'))
 }, 'charCount test')
+
+test(() => {
+    assertEquals(false, util.arrEquals([], [1, 2]))
+    assertEquals(true, util.arrEquals(['a', 8], ['a', 8]))
+})
