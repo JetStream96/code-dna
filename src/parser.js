@@ -270,7 +270,7 @@ function parseReturn(text) {
 
 // Match the lines that are effectively empty.
 function parseEmptyLines(text) {
-    return createToken(text, /^\W.*$/gm, TokenType.emptyLine)
+    return createToken(text, /^[^\w\n]*?\n/gm, TokenType.emptyLine)
 }
 
 exports.TokenType = TokenType
