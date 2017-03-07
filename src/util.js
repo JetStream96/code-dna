@@ -50,7 +50,42 @@ function arrEquals(arr1, arr2) {
     return arr1.every((e, i) => e === arr2[i])
 }
 
+/**
+ * @param {[]} arr
+ * @returns {[]} sorted array
+ */
+function bucketSort(arr, sortBy=i=>i) {
+    let buckets = putIntoBuckets(arr, sortBy)
+    return [].concat(...buckets.filter(b => b !== undefined))
+}
+
+function putIntoBuckets(arr, sortBy=i=>i) {
+    let prop = arr.map(e => sortBy(e))
+    if (!prop.every(e => Number.isInteger(e))) {
+        throw new Error('This method can only sort by integer.')
+    }
+
+    let min = Math.min(...prop)
+    let max = Math.max(...prop)
+    let buckets = new Array(max - min + 1)
+
+    let insert = elem => {
+        let index = sortBy(elem) - min
+        let b = buckets[index]
+        if (b === undefined) {
+            buckets[index] = [elem]
+        } else {
+            b.push(elem)
+        }
+    }
+
+    arr.forEach(e => insert(e))
+    return buckets
+}
+
 exports.strReplace = strReplace
 exports.range = range
 exports.charCount = charCount
 exports.arrEquals = arrEquals
+exports.bucketSort = bucketSort
+exports.putIntoBuckets = putIntoBuckets

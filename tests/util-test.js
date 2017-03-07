@@ -4,6 +4,9 @@ const [test, assertEquals] = [miniTest.test, miniTest.assertEquals]
 const util = require('../src/util')
 const range = util.range
 
+const testUtil = require('./util')
+const [assertArrEquals, assertThrows] = [testUtil.assertArrEquals, testUtil.assertThrows]
+
 test(() => {
     let sum = range(1, 3).reduce((x, y) => x + y)
     assertEquals(6, sum)
@@ -34,3 +37,16 @@ test(() => {
     assertEquals(false, util.arrEquals([], [1, 2]))
     assertEquals(true, util.arrEquals(['a', 8], ['a', 8]))
 })
+
+test(() => {
+    assertArrEquals([-8, -5, 0, 3], util.bucketSort([-5, 3, 0, -8]))
+}, 'bucket sort test')
+
+test(() => {
+    let [a, b, c] = [{x:3, y:10}, {x:4, y:-5}, {x:5, y:0}]
+    assertArrEquals([b, c, a], util.bucketSort([a, b, c], item => item.y))
+}, 'bucket sort by property test')
+
+test(() => {
+    assertThrows(() => util.bucketSort([8.5, 4, 2]))
+}, 'bucket sort not int should throw')

@@ -3,7 +3,7 @@ const [test, assertEquals] = [miniTest.test, miniTest.assertEquals]
 
 const parser = require('../src/parser')
 const util = require('../src/util')
-const testUtil = require('./test-util')
+const testUtil = require('./util')
 const assertArrEquals = testUtil.assertArrEquals
 
 test(() => {

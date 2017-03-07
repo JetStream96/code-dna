@@ -32,10 +32,13 @@ class StringLiteralToken extends Token {
     }
 }
 
-// filePath: string
-// returns: [Token]
-function parse(filePath) {
-    let text = fs.readFileSync(filePath).replace('\r\n', '\n')
+/**
+ * Parse the source file and returns all recognized tokens.
+ * @param {string} text
+ * @returns {Token[]}
+ */
+function parse(source) {
+    let text = source.replace('\r\n', '\n')
     let [text1, comments] = parseComments(text)
     let [t, strings] = parseStringLiterals(text1)
 
@@ -45,6 +48,7 @@ function parse(filePath) {
     let doWhile = parseDoWhile(t)
     let switchCase = parseSwitchCase(t)
     let forLoop = parseForLoop(t)
+    let func = parseFunc(t)
     let classOrStruct = parseClassOrStruct(t)
     let interface = parseInterface(t)
     let tryCatchFinally = parseTryCatchFinally(t)
@@ -54,6 +58,10 @@ function parse(filePath) {
     let returnStatement = parseReturn(t)
 
     let empty = parseEmptyLines(t)
+
+    return [].concat(comments, strings, property, field, ifElse, doWhile, switchCase, forLoop, 
+        func, classOrStruct, interface, tryCatchFinally, using, assignment, instantiation, 
+        returnStatement, empty)
 }
 
 /**
@@ -266,6 +274,7 @@ function parseEmptyLines(text) {
 }
 
 exports.TokenType = TokenType
+exports.parse = parse
 exports.parseComments = parseComments
 exports.lineNum = lineNum
 exports.reMatches = reMatches
