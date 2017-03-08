@@ -335,11 +335,11 @@ function parseEmptyLines(text) {
 }
 
 function negativeLookaheadGroup(words) {
-    let w = words.map(k => '\\b' + k + '\\b' )
+    let w = words.map(k => k + '\\b' )
     return '(?!' + w[0] + w.slice(1).map(k => '|' + k).join('') + ')' 
 }
 
-// Returns a regex like (?!\bint\b|\bfloat\b|\bdouble\b)
+// Returns a regex like (?!int\b|float\b|double\b)
 function rejectKeywords() {
     return negativeLookaheadGroup(keywords)
 }
