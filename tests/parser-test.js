@@ -209,7 +209,7 @@ test(() => {
     let s = `public static readonly List<string[]> S = "x";
     const int _y = 10;
     static string str;
-    private const int = 8;
+    private const int p = 8;
     int t = 10;
     int T() {return 10;}
     int U => 10;`
@@ -231,10 +231,10 @@ test(() => {
     int U => 10;
     int V(bool b) => 10;`
 
-    let tokens = parser.parseFunc(s)
-    assertEquals(true, tokens.every(t => t.type === parser.TokenType.function))
+    let tokens = parser.parseMethod(s)
+    assertEquals(true, tokens.every(t => t.type === parser.TokenType.method))
     assertArrEquals([4, 5, 10], tokens.map(t => t.lineNum))
-}, 'parseFunc test')
+}, 'parseMethod test')
 
 test(() => {
     let s = `a==b;
@@ -247,3 +247,18 @@ test(() => {
     let tokens = parser.parseAssignment(s)
     assertArrEquals([2, 4], tokens.map(t => t.lineNum))
 }, 'parse assignments test')
+
+test(() => {
+    let re = new RegExp(parser.identifierName())
+    assertEquals(false, re.test('new'))
+    assertEquals(true, re.test('_x0'))
+    assertEquals(false, re.test('0xy'))
+}, 'identifier regex test')
+
+test(() => {
+    let re = new RegExp(parser.typeName())
+    assertEquals(false, re.test('new'))
+    assertEquals(true, re.test('int'))
+    assertEquals(true, re.test('_x0'))
+    assertEquals(true, re.test('Dictionary<string, int[]>'))
+}, 'type name regex test')

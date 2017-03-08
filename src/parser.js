@@ -4,6 +4,74 @@ const util = require('./util')
 
 const range = util.range
 
+let TokenType = {
+    property: 0,
+    fieldOrLocal: 1,
+    ifStatement: 2,
+    whileStatement: 3,
+    switchCase: 4,
+    forLoop: 5,
+    method: 6,
+    classOrStruct: 7,
+    interface: 8,
+    emptyLine: 9,
+    comment: 10,
+    stringLiteral: 11,
+    tryCatchFinally: 12,
+    using: 13,
+    assignment: 14,
+    instantiation: 15,
+    return: 16
+}
+
+let tokenTypeStr = ['property', 'fieldOrLocal', 'ifStatement', 'whileStatement', 'switchCase',
+    'forLoop', 'function', 'classOrStruct', 'interface', 'emptyLine', 'comment', 'stringLiteral',
+    'tryCatchFinally', 'using', 'assignment', 'instantiation', 'return'] 
+
+let keywords = [
+    'abstract', 'as', 'base', 'bool',
+    'break', 'byte', 'case', 'catch',
+    'char', 'checked', 'class', 'const',
+    'continue', 'decimal', 'default', 'delegate',
+    'do', 'double', 'else', 'enum',
+    'event', 'explicit', 'extern', 'false',
+    'finally', 'fixed', 'float', 'for',
+    'foreach', 'goto', 'if', 'implicit',
+    'in', 'int', 'interface',
+    'internal', 'is', 'lock', 'long',
+    'namespace', 'new', 'null', 'object',
+    'operator', 'out', 'override',
+    'params', 'private', 'protected', 'public',
+    'readonly', 'ref', 'return', 'sbyte',
+    'sealed', 'short', 'sizeof', 'stackalloc',
+    'static', 'string', 'struct', 'switch',
+    'this', 'throw', 'true', 'try',
+    'typeof', 'uint', 'ulong', 'unchecked',
+    'unsafe', 'ushort', 'using', 'virtual',
+    'void', 'volatile', 'while']
+
+let keywordsNonTypeName = [
+    'abstract', 'as', 'base', 
+    'break', 'case', 'catch',
+    'checked', 'class', 'const',
+    'continue', 'default', 'delegate',
+    'do', 'else',
+    'event', 'explicit', 'extern', 'false',
+    'finally', 'fixed', 'for',
+    'foreach', 'goto', 'if', 'implicit',
+    'in', 'interface',
+    'internal', 'is', 'lock',
+    'namespace', 'new', 'null',
+    'operator', 'out', 'override',
+    'params', 'private', 'protected', 'public',
+    'readonly', 'ref', 'return',
+    'sealed', 'sizeof', 'stackalloc',
+    'static', 'struct', 'switch',
+    'this', 'throw', 'true', 'try',
+    'typeof', 'unchecked',
+    'unsafe', 'using', 'virtual',
+    'void', 'volatile', 'while']
+
 class Token {
 
     /**
@@ -48,7 +116,7 @@ function parse(source) {
     let doWhile = parseDoWhile(t)
     let switchCase = parseSwitchCase(t)
     let forLoop = parseForLoop(t)
-    let func = parseFunc(t)
+    let method = parseMethod(t)
     let classOrStruct = parseClassOrStruct(t)
     let interface = parseInterface(t)
     let tryCatchFinally = parseTryCatchFinally(t)
@@ -60,7 +128,7 @@ function parse(source) {
     let empty = filterEmptyLines(parseEmptyLines(t), strings, comments)
 
     return [].concat(comments, strings, property, field, ifElse, doWhile, switchCase, forLoop, 
-        func, classOrStruct, interface, tryCatchFinally, using, assignment, instantiation, 
+        method, classOrStruct, interface, tryCatchFinally, using, assignment, instantiation, 
         returnStatement, empty)
 }
 
@@ -120,31 +188,7 @@ function* reMatchesIter(input, re) {
     }
 }
 
-let TokenType = {
-    property: 0,
-    fieldOrLocal: 1,
-    ifStatement: 2,
-    whileStatement: 3,
-    switchCase: 4,
-    forLoop: 5,
-    function: 6,
-    classOrStruct: 7,
-    interface: 8,
-    emptyLine: 9,
-    comment: 10,
-    stringLiteral: 11,
-    tryCatchFinally: 12,
-    using: 13,
-    assignment: 14,
-    instantiation: 15,
-    return: 16
-}
-
-let tokenTypeStr = ['property', 'fieldOrLocal', 'ifStatement', 'whileStatement', 'switchCase',
-    'forLoop', 'function', 'classOrStruct', 'interface', 'emptyLine', 'comment', 'stringLiteral',
-    'tryCatchFinally', 'using', 'assignment', 'instantiation', 'return'] 
-
-function TokenTypeName(type) {
+function tokenTypeName(type) {
     return tokenTypeStr[type]
 }
 
@@ -246,19 +290,19 @@ function parseProperty(text) {
 }
 
 function parseFieldOrLocal(text) {
-    let mod = modifiers()
-    let id = identifierName()
     let re = new RegExp(`${modifierTypeIdentifier()}\\s*?(=(?!>)|;)`, 'g')
     return createToken(text, re, TokenType.fieldOrLocal)
 }
 
 function identifierName() {
-    return /\b[_A-Za-z]\w*?\b/.source
+    let namePattern = /[_A-Za-z]\w*?\b/.source
+    return `\\b${rejectKeywords()}${namePattern}`
 }
 
 function typeName() {
-    // Need to match generics and array.
-    return /\b[_A-Za-z][<, >\[\]\w]*?(?!<, >\[\]\w)/.source
+    // Need to match generics and array and cannot match language keywords.
+    let namePattern = /[_A-Za-z][<, >\[\]\w]*?(?!<, >\[\]\w)/.source
+    return `\\b${rejectNonTypeNameKeywords()}${namePattern}`
 }
 
 function modifiers() {
@@ -276,9 +320,9 @@ function modifierTypeIdentifier() {
     return `(${mod}\\s+?)*?${t}\\s+${id}`
 }
 
-function parseFunc(text) {
+function parseMethod(text) {
     let re = new RegExp(`${modifierTypeIdentifier()}\\s*?\\([^\\)]*?\\)`, 'g')
-    return createToken(text, re, TokenType.function)
+    return createToken(text, re, TokenType.method)
 }
 
 function parseReturn(text) {
@@ -288,6 +332,20 @@ function parseReturn(text) {
 // Match the lines that are effectively empty.
 function parseEmptyLines(text) {
     return createToken(text, /^[^\w\n]*?\n/gm, TokenType.emptyLine)
+}
+
+function negativeLookaheadGroup(words) {
+    let w = words.map(k => '\\b' + k + '\\b' )
+    return '(?!' + w[0] + w.slice(1).map(k => '|' + k).join('') + ')' 
+}
+
+// Returns a regex like (?!\bint\b|\bfloat\b|\bdouble\b)
+function rejectKeywords() {
+    return negativeLookaheadGroup(keywords)
+}
+
+function rejectNonTypeNameKeywords() {
+    return negativeLookaheadGroup(keywordsNonTypeName)
 }
 
 exports.TokenType = TokenType
@@ -300,6 +358,8 @@ exports.parseIfElse = parseIfElse
 exports.parseDoWhile = parseDoWhile
 exports.parseProperty = parseProperty
 exports.parseFieldOrLocal = parseFieldOrLocal
-exports.parseFunc = parseFunc
+exports.parseMethod = parseMethod
 exports.parseAssignment = parseAssignment
-exports.TokenTypeName = TokenTypeName
+exports.tokenTypeName = tokenTypeName
+exports.identifierName = identifierName
+exports.typeName = typeName

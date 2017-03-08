@@ -23,7 +23,7 @@ function getFileSummary() {
     let lines = Array(buckets.length).fill('')
     buckets.forEach((b, ind) => {
         if (b !== undefined) {
-            b.forEach(t => lines[ind] += ' ' + parser.TokenTypeName(t.type))
+            b.forEach(t => lines[ind] += ' ' + parser.tokenTypeName(t.type))
         }        
     })
 
