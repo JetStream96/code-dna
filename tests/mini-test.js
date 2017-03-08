@@ -9,7 +9,7 @@ exports.test = function(action, name) {
         summary[0]++
     } catch (err) {
         summary[1]++
-        console.log(`Test [${name}] failed: ` + err.message + `\n(${fileName})\n`)
+        console.log(`Test [${name}] failed: ${err.message}\n` + (fileName ? `(${fileName})\n` : ''))
     }
 }
 
@@ -19,9 +19,9 @@ exports.assertEquals = function(expected, actual) {
     }
 };
 
-function runAll(directory) {
+exports.runAll = function(directory=__dirname) {
     let paths = fs.readdirSync(directory)
-        .filter(p => p !== __filename)
+        .filter(p => p !== __filename && p !== path.join(__dirname, 'test-runner'))
         .map(p => path.join(directory, p))
 
     paths.forEach(p => {
@@ -33,7 +33,5 @@ function runAll(directory) {
             require(p)
         }
     });
+    return summary
 }
-
-runAll(__dirname)
-console.log(`\n${summary[0]} test(s) passed, ${summary[1]} test(s) failed.`)
