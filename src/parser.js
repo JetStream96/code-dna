@@ -25,7 +25,7 @@ let TokenType = {
 }
 
 let tokenTypeStr = ['property', 'fieldOrLocal', 'ifStatement', 'whileStatement', 'switchCase',
-    'forLoop', 'function', 'classOrStruct', 'interface', 'emptyLine', 'comment', 'stringLiteral',
+    'forLoop', 'method', 'classOrStruct', 'interface', 'emptyLine', 'comment', 'stringLiteral',
     'tryCatchFinally', 'using', 'assignment', 'instantiation', 'return'] 
 
 let keywords = [
@@ -70,7 +70,7 @@ let keywordsNonTypeName = [
     'this', 'throw', 'true', 'try',
     'typeof', 'unchecked',
     'unsafe', 'using', 'virtual',
-    'void', 'volatile', 'while']
+    'volatile', 'while']
 
 class Token {
 
