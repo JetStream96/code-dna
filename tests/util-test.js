@@ -5,7 +5,8 @@ const util = require('../src/util')
 const range = util.range
 
 const testUtil = require('./util')
-const [assertArrEquals, assertThrows] = [testUtil.assertArrEquals, testUtil.assertThrows]
+const [assertArrEquals, assertThrows, assertNumEquals] = 
+    [testUtil.assertArrEquals, testUtil.assertThrows, testUtil.assertNumEquals]
 
 test(() => {
     let sum = range(1, 3).reduce((x, y) => x + y)
@@ -50,3 +51,12 @@ test(() => {
 test(() => {
     assertThrows(() => util.bucketSort([8.5, 4, 2]))
 }, 'bucket sort not int should throw')
+
+test(() => {
+    assertEquals(6, util.sum([0, 1, 2, 3]))
+    assertEquals(35, util.sum([3, -1, -5], n => n * n))
+}, 'arr sum test')
+
+test(() => {
+    assertNumEquals(2, util.stdDeviation([2, 4, 4, 4, 5, 5, 7, 9]))
+}, 'std deviation test')

@@ -59,6 +59,9 @@ function bucketSort(arr, sortBy=i=>i) {
     return [].concat(...buckets.filter(b => b !== undefined))
 }
 
+/**
+ * Given an array of objects, this function returns an array of buckets with type array or undefined.
+ */
 function putIntoBuckets(arr, sortBy=i=>i) {
     let prop = arr.map(e => sortBy(e))
     if (!prop.every(e => Number.isInteger(e))) {
@@ -83,9 +86,37 @@ function putIntoBuckets(arr, sortBy=i=>i) {
     return buckets
 }
 
+function groupBy(arr, selector=i=>i) {
+    let map = new Map()
+    arr.forEach(e => {
+        let key = selector(e)
+        let group = map[key]
+        if (group === undefined) {
+            map[key] = [e]
+        } else {
+            group.push(e)
+        }
+    })
+
+    return map
+}
+
+function sum(arr, map=i=>i) {
+    return arr.reduce((s, x) => s + map(x), 0)
+}
+
+function stdDeviation(arr) {
+    let n = arr.length
+    let avg = sum(arr) / n
+    return Math.sqrt(sum(arr, e => (e - avg) * (e - avg)) / n)
+}
+
 exports.strReplace = strReplace
 exports.range = range
 exports.charCount = charCount
 exports.arrEquals = arrEquals
 exports.bucketSort = bucketSort
 exports.putIntoBuckets = putIntoBuckets
+exports.groupBy = groupBy
+exports.sum = sum
+exports.stdDeviation = stdDeviation

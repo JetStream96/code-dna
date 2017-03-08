@@ -18,5 +18,10 @@ function assertThrows(action) {
     }
 }
 
+function assertNumEquals(expected, actual, delta=1E-7) {
+    miniTest.assertEquals(true, Math.abs(expected - actual) <= delta)
+}
+
 exports.assertArrEquals = assertArrEquals
 exports.assertThrows = assertThrows
+exports.assertNumEquals = assertNumEquals
