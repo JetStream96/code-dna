@@ -214,10 +214,10 @@ test(() => {
     int T() {return 10;}
     int U => 10;`
 
-    let tokens = parser.parseFields(s)
-    assertEquals(true, tokens.every(t => t.type === parser.TokenType.field))
+    let tokens = parser.parseFieldOrLocal(s)
+    assertEquals(true, tokens.every(t => t.type === parser.TokenType.fieldOrLocal))
     assertArrEquals([1, 2, 3, 4, 5], tokens.map(t => t.lineNum))
-}, 'parseFields test')
+}, 'parseFieldOrLocal test')
 
 test(() => {
     let s = `static string str;

@@ -43,7 +43,7 @@ function parse(source) {
     let [t, strings] = parseStringLiterals(text1)
 
     let property = parseProperty(t)
-    let field = parseFields(t)
+    let field = parseFieldOrLocal(t)
     let ifElse = parseIfElse(t)
     let doWhile = parseDoWhile(t)
     let switchCase = parseSwitchCase(t)
@@ -113,7 +113,7 @@ function* reMatchesIter(input, re) {
 
 let TokenType = {
     property: 0,
-    field: 1,
+    fieldOrLocal: 1,
     ifStatement: 2,
     whileStatement: 3,
     switchCase: 4,
@@ -129,6 +129,14 @@ let TokenType = {
     assignment: 14,
     instantiation: 15,
     return: 16
+}
+
+let tokenTypeStr = ['property', 'fieldOrLocal', 'ifStatement', 'whileStatement', 'switchCase',
+    'forLoop', 'function', 'classOrStruct', 'interface', 'emptyLine', 'comment', 'stringLiteral',
+    'tryCatchFinally', 'using', 'assignment', 'instantiation', 'return'] 
+
+function TokenTypeName(type) {
+    return tokenTypeStr[type]
 }
 
 /**
@@ -228,11 +236,11 @@ function parseProperty(text) {
     return createToken(text, re, TokenType.property)
 }
 
-function parseFields(text) {
+function parseFieldOrLocal(text) {
     let mod = modifiers()
     let id = identifierName()
     let re = new RegExp(`${modifierTypeIdentifier()}\\s*?(=(?!>)|;)`, 'g')
-    return createToken(text, re, TokenType.field)
+    return createToken(text, re, TokenType.fieldOrLocal)
 }
 
 function identifierName() {
@@ -282,6 +290,7 @@ exports.parseStringLiterals = parseStringLiterals
 exports.parseIfElse = parseIfElse
 exports.parseDoWhile = parseDoWhile
 exports.parseProperty = parseProperty
-exports.parseFields = parseFields
+exports.parseFieldOrLocal = parseFieldOrLocal
 exports.parseFunc = parseFunc
 exports.parseAssignment = parseAssignment
+exports.TokenTypeName = TokenTypeName
