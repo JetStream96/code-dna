@@ -57,11 +57,20 @@ function parse(source) {
     let instantiation = parseNew(t)
     let returnStatement = parseReturn(t)
 
-    let empty = parseEmptyLines(t)
+    let empty = filterEmptyLines(parseEmptyLines(t), strings, comments)
 
     return [].concat(comments, strings, property, field, ifElse, doWhile, switchCase, forLoop, 
         func, classOrStruct, interface, tryCatchFinally, using, assignment, instantiation, 
         returnStatement, empty)
+}
+
+/**
+ * Because comments and strings are replaced with spaces when parsing, lines that contains only
+ * comments or strings may be incorrectly flagged as empty lines.
+ */
+function filterEmptyLines(emptyLineTokens, stringTokens, commentTokens) {
+    let s = new Set(commentTokens.concat(stringTokens).map(t => t.lineNum))
+    return emptyLineTokens.filter(t => !s.has(t.lineNum))
 }
 
 /**
