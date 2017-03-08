@@ -38,7 +38,7 @@ class StringLiteralToken extends Token {
  * @returns {Token[]}
  */
 function parse(source) {
-    let text = source.replace('\r\n', '\n')
+    let text = source.replace(/\r\n/g, '\n')
     let [text1, comments] = parseComments(text)
     let [t, strings] = parseStringLiterals(text1)
 
