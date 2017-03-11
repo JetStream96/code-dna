@@ -4,7 +4,7 @@ const util = require('./util')
 
 const range = util.range
 
-let TokenType = {
+let tokenType = {
     property: 0,
     fieldOrLocal: 1,
     ifStatement: 2,
@@ -86,7 +86,7 @@ class Token {
 
 class CommentToken extends Token {
     constructor(lineNum, lineSpan, length) {
-        super(lineNum, TokenType.comment)
+        super(lineNum, tokenType.comment)
         this.lineSpan = lineSpan
         this.length = length
     }
@@ -94,7 +94,7 @@ class CommentToken extends Token {
 
 class StringLiteralToken extends Token {
     constructor(lineNum, lineSpan, length) {
-        super(lineNum, TokenType.stringLiteral)
+        super(lineNum, tokenType.stringLiteral)
         this.lineSpan = lineSpan
         this.length = length
     }
@@ -243,55 +243,55 @@ function createToken(text, re, type) {
  * @returns {Token[]}
  */
 function parseIfElse(text) {
-    return createToken(text, /\b((else\s+)?if)|(else)\b/g, TokenType.ifStatement)
+    return createToken(text, /\b((else\s+)?if)|(else)\b/g, tokenType.ifStatement)
 }
 
 function parseDoWhile(text) {
-    return createToken(text, /\b(do|while)\b/g, TokenType.whileStatement)
+    return createToken(text, /\b(do|while)\b/g, tokenType.whileStatement)
 }
 
 function parseSwitchCase(text) {
-    return createToken(text, /\b(switch|case)\b/g, TokenType.switchCase)
+    return createToken(text, /\b(switch|case)\b/g, tokenType.switchCase)
 }
 
 function parseForLoop(text) {
-    return createToken(text, /\bfor(each)?\b/g, TokenType.forLoop)
+    return createToken(text, /\bfor(each)?\b/g, tokenType.forLoop)
 }
 
 function parseClassOrStruct(text) {
-    return createToken(text, /\b(class|struct)\b/g, TokenType.classOrStruct)
+    return createToken(text, /\b(class|struct)\b/g, tokenType.classOrStruct)
 }
 
 function parseInterface(text) {
-    return createToken(text, /\binterface\b/g, TokenType.interface)
+    return createToken(text, /\binterface\b/g, tokenType.interface)
 }
 
 function parseTryCatchFinally(text) {
-    return createToken(text, /\b(try|catch|finally)\b/g, TokenType.tryCatchFinally)
+    return createToken(text, /\b(try|catch|finally)\b/g, tokenType.tryCatchFinally)
 }
 
 function parseUsing(text) {
-    return createToken(text, /\busing\b/g, TokenType.using)
+    return createToken(text, /\busing\b/g, tokenType.using)
 }
 
 function parseAssignment(text) {
-    return createToken(text, /[\b\s][+\-*/]?=[\b\s]/g, TokenType.assignment)
+    return createToken(text, /[\b\s][+\-*/]?=[\b\s]/g, tokenType.assignment)
 }
 
 function parseNew(text) {
-    return createToken(text, /\bnew\b/g, TokenType.instantiation)
+    return createToken(text, /\bnew\b/g, tokenType.instantiation)
 }
 
 function parseProperty(text) {
     let mti = modifierTypeIdentifier()
     let am = accessModifiers()
     let re = new RegExp(`${mti}\\s*?(=>|{\\s*?${am}?\\s*?[gs]et\\s*?[;{])`, 'g')
-    return createToken(text, re, TokenType.property)
+    return createToken(text, re, tokenType.property)
 }
 
 function parseFieldOrLocal(text) {
     let re = new RegExp(`${modifierTypeIdentifier()}\\s*?(=(?!>)|;)`, 'g')
-    return createToken(text, re, TokenType.fieldOrLocal)
+    return createToken(text, re, tokenType.fieldOrLocal)
 }
 
 function identifierName() {
@@ -322,16 +322,16 @@ function modifierTypeIdentifier() {
 
 function parseMethod(text) {
     let re = new RegExp(`${modifierTypeIdentifier()}\\s*?\\([^\\)]*?\\)`, 'g')
-    return createToken(text, re, TokenType.method)
+    return createToken(text, re, tokenType.method)
 }
 
 function parseReturn(text) {
-    return createToken(text, /\breturn\b/g, TokenType.return)
+    return createToken(text, /\breturn\b/g, tokenType.return)
 }
 
 // Match the lines that are effectively empty.
 function parseEmptyLines(text) {
-    return createToken(text, /^[^\w\n]*?\n/gm, TokenType.emptyLine)
+    return createToken(text, /^[^\w\n]*?\n/gm, tokenType.emptyLine)
 }
 
 function negativeLookaheadGroup(words) {
@@ -348,7 +348,7 @@ function rejectNonTypeNameKeywords() {
     return negativeLookaheadGroup(keywordsNonTypeName)
 }
 
-exports.TokenType = TokenType
+exports.tokenType = tokenType
 exports.parse = parse
 exports.parseComments = parseComments
 exports.lineNum = lineNum

@@ -91,7 +91,7 @@ test(() => {
     assertEquals(`"xyz\\""`.length, t.length)
     assertEquals(1 , t.lineNum)
     assertEquals(1, t.lineSpan)
-    assertEquals(parser.TokenType.stringLiteral, t.type)
+    assertEquals(parser.tokenType.stringLiteral, t.type)
 }, 'basic string literal test')
 
 test(() => {
@@ -106,7 +106,7 @@ test(() => {
     1"`.length, t.length)
     assertEquals(1 , t.lineNum)
     assertEquals(2, t.lineSpan)
-    assertEquals(parser.TokenType.stringLiteral, t.type)
+    assertEquals(parser.tokenType.stringLiteral, t.type)
 }, 'verbatim string test')
 
 test(() => {
@@ -119,7 +119,7 @@ test(() => {
     assertEquals(`$"xyz\\"1"`.length, t.length)
     assertEquals(1 , t.lineNum)
     assertEquals(1, t.lineSpan)
-    assertEquals(parser.TokenType.stringLiteral, t.type)
+    assertEquals(parser.tokenType.stringLiteral, t.type)
 }, 'verbatim string test')
 
 test(() => {
@@ -160,7 +160,7 @@ test(() => {
     assertEquals(2, t0.lineNum)
     assertEquals(6, t1.lineNum)
     assertEquals(10, t2.lineNum)
-    assertEquals(true, tokens.every(t => t.type === parser.TokenType.ifStatement)) 
+    assertEquals(true, tokens.every(t => t.type === parser.tokenType.ifStatement)) 
 }, 'parsing if else test')
 
 test(() => {
@@ -185,7 +185,7 @@ test(() => {
     assertEquals(4, t1.lineNum)
     assertEquals(7, t2.lineNum)
     assertEquals(9, t3.lineNum)
-    assertEquals(true, tokens.every(t => t.type === parser.TokenType.whileStatement))
+    assertEquals(true, tokens.every(t => t.type === parser.tokenType.whileStatement))
 }, 'parsing do while test')
 
 test(() => {
@@ -201,7 +201,7 @@ test(() => {
     }`
 
     let tokens = parser.parseProperty(s)
-    assertEquals(true, tokens.every(t => t.type === parser.TokenType.property))
+    assertEquals(true, tokens.every(t => t.type === parser.tokenType.property))
     assertArrEquals([1, 2, 3, 4], tokens.map(t => t.lineNum))
 }, 'parsing property test')
 
@@ -215,7 +215,7 @@ test(() => {
     int U => 10;`
 
     let tokens = parser.parseFieldOrLocal(s)
-    assertEquals(true, tokens.every(t => t.type === parser.TokenType.fieldOrLocal))
+    assertEquals(true, tokens.every(t => t.type === parser.tokenType.fieldOrLocal))
     assertArrEquals([1, 2, 3, 4, 5], tokens.map(t => t.lineNum))
 }, 'parseFieldOrLocal test')
 
@@ -232,7 +232,7 @@ test(() => {
     int V(bool b) => 10;`
 
     let tokens = parser.parseMethod(s)
-    assertEquals(true, tokens.every(t => t.type === parser.TokenType.method))
+    assertEquals(true, tokens.every(t => t.type === parser.tokenType.method))
     assertArrEquals([4, 5, 10], tokens.map(t => t.lineNum))
 }, 'parseMethod test')
 
