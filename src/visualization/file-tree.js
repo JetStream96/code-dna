@@ -69,5 +69,17 @@ function readFile(file) {
 }
 
 function collapseTree(rootNode) {
-    
+
+}
+
+function mergeChildren(node) {
+
+}
+
+function childrenCount(node) {
+    if (node.children.length === 0) {
+        // File or empty directory.
+        return 0
+    }
+    return util.sum(node.children, child => 1 + childrenCount(child))
 }
