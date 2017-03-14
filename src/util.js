@@ -111,6 +111,10 @@ function stdDeviation(arr) {
     return Math.sqrt(sum(arr, e => (e - avg) * (e - avg)) / n)
 }
 
+function lineCount(text) {
+    return text.split(/\r?\n/g).length
+}
+
 exports.strReplace = strReplace
 exports.range = range
 exports.charCount = charCount
@@ -120,3 +124,4 @@ exports.putIntoBuckets = putIntoBuckets
 exports.groupBy = groupBy
 exports.sum = sum
 exports.stdDeviation = stdDeviation
+exports.lineCount = lineCount

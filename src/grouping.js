@@ -15,7 +15,8 @@ let displayTypes = {
     using: 9,
     assignment: 10,
     instantiation: 11,
-    return: 12
+    return: 12,
+    other: 13
 }
 
 // For example, this maps '9' to 5 means that 9th element of parser.TokenType is grouped as 
@@ -42,7 +43,7 @@ let fromTokenTypes = {
 
 let displayNames = [ 'property/method', 'field/local variable', 'if/switch case', 'while/for loop',
     'class/struct/interface', 'empty line', 'comment', 'string literal', 'try/catch/finally', 
-    'using', 'assignment', 'instantiation', 'return']
+    'using', 'assignment', 'instantiation', 'return', 'other']
 
 exports.displayTypes = displayTypes
 exports.displayNames = displayNames

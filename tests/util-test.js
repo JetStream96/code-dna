@@ -60,3 +60,7 @@ test(() => {
 test(() => {
     assertNumEquals(2, util.stdDeviation([2, 4, 4, 4, 5, 5, 7, 9]))
 }, 'std deviation test')
+
+test(() => {
+    assertNumEquals(5, util.lineCount('as\nasd\r\n\r\n\na'))
+})

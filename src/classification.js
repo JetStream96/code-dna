@@ -4,17 +4,14 @@ const grouping = require('./grouping')
 
 const range = util.range
 
-// Indicates token that is not of any type specified in grouping.displayTypes.
-const otherType = -1;
-
 /**
  * Parse the source code and group the tokens according to policy specified in grouping.js.
  * @param {string} text 
  */
 function classifiedTokens(text) {
     let tokens = parser.parse(text)
-    let lineCount = text.split(/\r?\n/g).length
-    let other = getOtherToken(lineCount, other)
+    let lineCount = util.lineCount(text)
+    let other = getOtherToken(lineCount, tokens)
     let groups = groupByPolicy(tokens.concat(other))
     let stats = groups.map(tokensInType => {
         let occurence = tokensInType.length
@@ -46,11 +43,11 @@ function getOtherToken(lineCount, tokens) {
     let res = []
     range(0, lineCount).forEach(i => {
         if (m[i] !== 0) {
-            res.push(new parser.Token(i, otherType))
+            res.push(new parser.Token(i, grouping.displayTypes.other))
         }
     })
     return res
 }
 
-exports.otherType = otherType
+exports.classifiedTokens = classifiedTokens
 exports.getOtherToken = getOtherToken
