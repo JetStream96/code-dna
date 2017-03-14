@@ -363,3 +363,4 @@ exports.parseAssignment = parseAssignment
 exports.tokenTypeName = tokenTypeName
 exports.identifierName = identifierName
 exports.typeName = typeName
+exports.Token = Token
