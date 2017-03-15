@@ -28,7 +28,16 @@ function* rangeIter(start, count) {
     }
 }
 
+/**
+ * Usage: range(2, 3): [2, 3, 4], range(3): [0, 1, 2]
+ * @param {*} start 
+ * @param {*} count 
+ */
 function range(start, count) {
+    if (count === undefined) {
+        return range(0 ,start)
+    }
+    
     return [...rangeIter(start, count)]
 }
 

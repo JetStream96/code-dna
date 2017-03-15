@@ -21,6 +21,10 @@ test(() => {
 }, 'range test 2')
 
 test(() => {
+    assertArrEquals([0, 1, 2, 3], range(4))
+}, 'range test 3')
+
+test(() => {
     let s = util.strReplace('123456789', [[0, 1], [4, 3]])
     assertEquals(' 234   89', s)
 }, 'strReplace test')

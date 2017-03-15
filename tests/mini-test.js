@@ -17,7 +17,7 @@ exports.assertEquals = function(expected, actual) {
     if (expected !== actual) {
         throw new Error(`Assertion error: expected ${expected}, but is ${actual}.`)
     }
-};
+}
 
 exports.runAll = function(directory=__dirname) {
     let paths = fs.readdirSync(directory)
@@ -32,6 +32,6 @@ exports.runAll = function(directory=__dirname) {
             fileName = p
             require(p)
         }
-    });
+    })
     return summary
 }

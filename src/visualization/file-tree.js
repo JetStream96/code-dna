@@ -6,6 +6,7 @@ const fs = require('fs')
 const classification = require('../classification')
 const util = require('../util')
 
+const range = util.range
 const emptyArr = []
 
 class Node {
@@ -49,10 +50,10 @@ function readDir(dir) {
         let stat = fs.statSync(p)
         if (stat.isDirectory()) {
             return Node.createDir(readDir(p), p)
-        } else if (stat.isFile()) {
+        } else if (stat.isFile() && filterFile(p)) {
             return readFile(p)
         }
-    });
+    })
 
     return Node.createDir(children, dir)
 }
@@ -68,14 +69,75 @@ function readFile(file) {
     return new Node(tokenInfo, true, [], file, lineCount)
 }
 
-function collapseTree(rootNode) {
-
+/**
+ * Recursively merge nodes of all children which satisfies the criteria of mergeChildren,
+ * until the total node count is no larger than maxNodeCount.
+ */
+function collapseTree(rootNode, maxNodeCount) {
+    if (maxNodeCount < 1) {
+        throw new Error()
+    }
+    
+    let nodeCount = childrenCount(rootNode) + 1
+    let targetNodes = addMergeTarget(new Set(), rootNode)
+    
+    while (nodeCount > maxNodeCount) {
+        // Well, the nodes need to know their parent ...
+    }
 }
 
+/**
+ * If the node itself or any child can be merged, it will be added to the set.
+ * @param {Set} set 
+ * @param {Node} node 
+ */
+function addMergeTarget(set, node) {
+    if (canMergeChildren(node)) {
+        set.add(node)
+    } else {
+        node.children.forEach(c => addMergeTarget(set, c))
+    }
+}
+
+function canMergeChildren(node) {
+    let children = node.children
+    return children.length > 0 && children.every(c => c.children.length === 0)
+}
+
+/**
+ * @param {Node} node A node where all its children are leaves.
+ * @returns {Node} New node
+ */
 function mergeChildren(node) {
+    if (!canMergeChildren(node)) {
+        throw new Error()
+    }
 
+    let children = node.children
+    let totalLineCount = util.sum(children, c => c.lineCount)
+
+    // Merge token array.
+    let len = children[0].tokens.length
+    let newTokens = []
+    range(len).forEach(i => newTokens[i] = [0, 0])
+
+    children.forEach(c => {
+        range(len).forEach(i => {
+            let [occ, sd] = c.tokens[i]
+            let [occSum, sdSum] = newTokens[i]
+            newTokens[i] = [occ + occSum, sd * c.lineCount + sdSum]
+        })
+    })
+
+    // Weighted average of sd.
+    range(len).forEach(i => newTokens[i][1] /= totalLineCount)
+    return new Node(newTokens, node.isFile, emptyArr, node.fullPath, totalLineCount)
 }
 
+/**
+ * Returns the number of child nodes.
+ * @param {Node} node 
+ */
 function childrenCount(node) {
     if (node.children.length === 0) {
         // File or empty directory.
