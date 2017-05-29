@@ -27,7 +27,7 @@ exports.runAll = function(directory=__dirname) {
     paths.forEach(p => {
         let stat = fs.statSync(p)
         if (stat.isDirectory()) {
-            runAll(p)
+            exports.runAll(p)
         } else if (stat.isFile()) {
             fileName = p
             require(p)

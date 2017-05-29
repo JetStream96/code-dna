@@ -124,6 +124,14 @@ function lineCount(text) {
     return text.split(/\r?\n/g).length
 }
 
+/**
+ * Returns an element in the non-empty set.
+ * @param {*} set.
+ */
+function any(set) {
+    return set.entries().next().value[0]
+}
+
 exports.strReplace = strReplace
 exports.range = range
 exports.charCount = charCount
@@ -134,3 +142,4 @@ exports.groupBy = groupBy
 exports.sum = sum
 exports.stdDeviation = stdDeviation
 exports.lineCount = lineCount
+exports.any = any

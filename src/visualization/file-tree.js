@@ -9,6 +9,9 @@ const util = require('../util')
 const range = util.range
 const emptyArr = []
 
+/**
+ * Should be used as an immutable object.
+ */
 class Node {
     /**
      * Create a node without child. Usually this is for a source file, but a bottom-level node
@@ -16,13 +19,15 @@ class Node {
      * @param {[]} tokens An array where each index contains token info of that type.
      * The token info is an array containing occurence and standard deviation.
      * @param {boolean} isFile True for file. False for directory.
-     * @param {Node[]} children The child nodes. Empty array if not avail.
+     * @param {Node} parent Undefined if it has no parent.
+     * @param {Set} children The child nodes. Empty set if there is none.
      * @param {string} fullPath The file/directory path.
      * @param {number} lineCount Total line count of the file or all files combined in the directory.
      */
-    constructor(tokens, isFile, children, fullPath, lineCount) {
+    constructor(tokens, isFile, parent, children, fullPath, lineCount) {
         this.tokens = tokens
         this.isFile = isFile
+        this.parent = parent
         this.children = children
         this.fullPath = fullPath
         this.lineCount = lineCount
@@ -32,11 +37,11 @@ class Node {
      * For directory, tokens is empty and lineCount is set to -1.
      */
     static createDir(children, fullPath) {
-        return new Node(emptyArr, false, children, fullPath, -1)
+        return new Node(emptyArr, false, undefined, children, fullPath, -1)
     }
 }
 
-function filterFile(filePath) {
+function isTargetCodeFile(filePath) {
     return /\.cs$/.test(filePath)
 }
 
@@ -50,7 +55,7 @@ function readDir(dir) {
         let stat = fs.statSync(p)
         if (stat.isDirectory()) {
             return Node.createDir(readDir(p), p)
-        } else if (stat.isFile() && filterFile(p)) {
+        } else if (stat.isFile() && isTargetCodeFile(p)) {
             return readFile(p)
         }
     })
@@ -66,28 +71,40 @@ function readFile(file) {
     let text = fs.readFileSync(file, 'utf8');
     let lineCount = util.lineCount(file)
     let tokenInfo = classification.classifiedTokens(text)
-    return new Node(tokenInfo, true, [], file, lineCount)
+    return new Node(tokenInfo, true, undefined, [], file, lineCount)
 }
 
 /**
  * Recursively merge nodes of all children which satisfies the criteria of mergeChildren,
- * until the total node count is no larger than maxNodeCount.
+ * i.e. until the total node count is no larger than maxNodeCount.
  */
 function collapseTree(rootNode, maxNodeCount) {
     if (maxNodeCount < 1) {
         throw new Error()
     }
     
-    let nodeCount = childrenCount(rootNode) + 1
-    let targetNodes = addMergeTarget(new Set(), rootNode)
-    
+    let nodeCount = descendantCount(rootNode) + 1
+    let mergeTargets = new Set()
+    let targetNodes = addMergeTarget(mergeTargets, rootNode)
+        
     while (nodeCount > maxNodeCount) {
+        
+        // Get an element in the set.
+        let target = util.any(mergeTargets)
+        
+        mergeTargets.delete(target)
+        let newNode = mergeChildren(target)
+        let parent = target.parent
+        parent.children.delete(target)
+        parent.children.add(newNode)
+
+        //nodeCount -= target.
         // Well, the nodes need to know their parent ...
     }
 }
 
 /**
- * If the node itself or any child can be merged, it will be added to the set.
+ * For the node itself and all its descendents, if a node can be merged, it will be added to the set.
  * @param {Set} set 
  * @param {Node} node 
  */
@@ -99,14 +116,18 @@ function addMergeTarget(set, node) {
     }
 }
 
+/**
+ * Returns true if the given node has at least a child and each of its child is a leaf.
+ */
 function canMergeChildren(node) {
     let children = node.children
     return children.length > 0 && children.every(c => c.children.length === 0)
 }
 
 /**
+ * Given a node whose children are all leaves, merge them into the current node.
  * @param {Node} node A node where all its children are leaves.
- * @returns {Node} New node
+ * @returns {Node} The new node
  */
 function mergeChildren(node) {
     if (!canMergeChildren(node)) {
@@ -117,7 +138,7 @@ function mergeChildren(node) {
     let totalLineCount = util.sum(children, c => c.lineCount)
 
     // Merge token array.
-    let len = children[0].tokens.length
+    let len = util.any(children).tokens.length
     let newTokens = []
     range(len).forEach(i => newTokens[i] = [0, 0])
 
@@ -131,17 +152,17 @@ function mergeChildren(node) {
 
     // Weighted average of sd.
     range(len).forEach(i => newTokens[i][1] /= totalLineCount)
-    return new Node(newTokens, node.isFile, emptyArr, node.fullPath, totalLineCount)
+    return new Node(newTokens, node.isFile, node.parent, emptyArr, node.fullPath, totalLineCount)
 }
 
 /**
  * Returns the number of child nodes.
  * @param {Node} node 
  */
-function childrenCount(node) {
-    if (node.children.length === 0) {
+function descendantCount(node) {
+    if (node.children.size === 0) {
         // File or empty directory.
         return 0
     }
-    return util.sum(node.children, child => 1 + childrenCount(child))
+    return util.sum(node.children, child => 1 + descendantCount(child))
 }

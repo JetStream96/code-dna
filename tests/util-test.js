@@ -67,4 +67,11 @@ test(() => {
 
 test(() => {
     assertNumEquals(5, util.lineCount('as\nasd\r\n\r\n\na'))
-})
+}, 'lineCount test')
+
+test(() => {
+    let set = new Set()
+    set.add(9)
+    set.add(2)
+    assertNumEquals(9, util.any(set))
+}, 'any test')
